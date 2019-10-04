@@ -13,9 +13,14 @@
 
     <packaging>pom</packaging>
 
+    <modules>
+        <module>hw01-maven</module>
+    </modules>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>12</maven.compiler.release>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <com.google.guava.version>27.1-jre</com.google.guava.version>
         <org.apache.maven.plugin.assembly.version>3.1.1</org.apache.maven.plugin.assembly.version>
     </properties>
