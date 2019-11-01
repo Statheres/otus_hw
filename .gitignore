@@ -24,3 +24,7 @@ hs_err_pid*
 
 # maven tmp directory
 target
+
+# IDEA
+*.iml
+.idea
