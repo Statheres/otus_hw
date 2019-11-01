@@ -13,10 +13,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GCBenchmark implements Runnable, GCBenchmarkMBean {
-    private static final int DEFAULT_OLD_GENERATION_INCREMENT = 10000;
+    private static final int DEFAULT_OLD_GENERATION_INCREMENT = 50000;
     private static final int DEFAULT_OLD_GENERATION_DECREMENT = 1000;
-    private static final int DEFAULT_NEW_GENERATION_SIZE = 1000;
-    private static final int DEFAULT_TIMEOUT = 2;
+    private static final int DEFAULT_NEW_GENERATION_SIZE = 100000;
+    private static final int DEFAULT_TIMEOUT = 2000;
 
     private ScheduledThreadPoolExecutor executor;
 
@@ -102,14 +102,12 @@ public class GCBenchmark implements Runnable, GCBenchmarkMBean {
             for (int i = 0; i < newGenerationSize; ++i) {
                 newGenerationData.add(new String("Some new string"));
             }
-
-            Thread.sleep(timeout);
         } catch (Exception e) {
             System.out.println(e);
         }
 
         if (isRunning.get()) {
-            executor.schedule(this, 1, TimeUnit.SECONDS);
+            executor.schedule(this, timeout, TimeUnit.MILLISECONDS);
         }
     }
 
