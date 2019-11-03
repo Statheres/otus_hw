@@ -7,39 +7,39 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestRunner {
+class TestRunner {
+    private List<Method> testMethods;
+    private List<Method> beforeMethods;
+    private List<Method> afterMethods;
+    private Class<?> testClass;
+    private Constructor<?> testConstructor;
 
-    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        if (args.length != 1) {
-            throw new IllegalArgumentException("Test class name is not specified");
-        }
+    TestRunner(String testClassName) throws ClassNotFoundException, NoSuchMethodException {
+        testClass = Class.forName(testClassName);
 
-        String testClassName = args[0];
+        testMethods = getAnnotatedMethods(testClass, Test.class);
+        beforeMethods = getAnnotatedMethods(testClass, Before.class);
+        afterMethods = getAnnotatedMethods(testClass, After.class);
 
-        Class<?> testClass = Class.forName(testClassName);
-
-        List<Method> testMethods = getAnnotatedMethods(testClass, Test.class);
-        List<Method> beforeMethods = getAnnotatedMethods(testClass, Before.class);
-        List<Method> afterMethods = getAnnotatedMethods(testClass, After.class);
-
-        System.out.println("-------------------------------------------------------------------------");
-        System.out.println("T E S T S");
-        System.out.println("-------------------------------------------------------------------------");
-        System.out.println(String.format("Running '%s' with %d tests", testClassName, testMethods.size()));
-
-        int passedCount = runTests(
-                testClass.getConstructor(),
-                beforeMethods,
-                testMethods,
-                afterMethods
-        );
-
-        System.out.println("-------------------------------------------------------------------------");
-        System.out.println(String.format("Passed: %d,  Failed: %d", passedCount, testMethods.size() - passedCount));
-        System.out.println("-------------------------------------------------------------------------");
+        testConstructor = testClass.getConstructor();
+        testConstructor.setAccessible(true);
     }
 
-    static List<Method> getAnnotatedMethods(Class<?> clazz, Class<? extends Annotation> annotationClass) {
+    void run() {
+        System.out.println("#########################################################################");
+        System.out.println("T E S T S");
+        System.out.println("#########################################################################");
+        System.out.println(String.format("Running '%s' with %d tests", testClass.getName(), testMethods.size()));
+        System.out.println("#########################################################################");
+
+        int passedCount = runAllTests();
+
+        System.out.println("#########################################################################");
+        System.out.println(String.format("Passed: %d,  Failed: %d", passedCount, testMethods.size() - passedCount));
+        System.out.println("#########################################################################");
+    }
+
+    private List<Method> getAnnotatedMethods(Class<?> clazz, Class<? extends Annotation> annotationClass) {
         List<Method> annotatedMethods = new ArrayList<>();
         for (Method method : clazz.getMethods()) {
             if (method.isAnnotationPresent(annotationClass)) {
@@ -50,31 +50,43 @@ public class TestRunner {
         return annotatedMethods;
     }
 
-    static int runTests(Constructor<?> testConstructor, List<Method> beforeMethods, List<Method> testMethods, List<Method> afterMethods) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    private int runAllTests() {
         int passedCount = 0;
 
         for (Method test : testMethods) {
-            Object testObject = testConstructor.newInstance();
-
-            for (Method before : beforeMethods) {
-                before.invoke(testObject);
-            }
-
-            boolean passed = true;
             try {
-                test.invoke(testObject);
+                Object testObject = testConstructor.newInstance();
+
+                try {
+                    setUpTest(testObject);
+
+                    test.invoke(testObject);
+                } finally {
+                    tearDownTest(testObject);
+                }
+
                 ++passedCount;
+
+                System.out.println(String.format("%s: Passed", test.getName()));
             } catch (Exception e) {
-                passed = false;
+                System.out.println(String.format("%s: Failed %s%s", test.getName(), System.lineSeparator(), e));
             }
 
-            for (Method after : afterMethods) {
-                after.invoke(testObject);
-            }
-
-            System.out.println(String.format("%s: %s", test.getName(), (passed ? "Passed" : "Failed")));
+            System.out.println("-------------------------------------------------------------------------");
         }
 
         return passedCount;
+    }
+
+    private void setUpTest(Object testObject) throws InvocationTargetException, IllegalAccessException {
+        for (Method before : beforeMethods) {
+            before.invoke(testObject);
+        }
+    }
+
+    private void tearDownTest(Object testObject) throws InvocationTargetException, IllegalAccessException {
+        for (Method after : afterMethods) {
+            after.invoke(testObject);
+        }
     }
 }
