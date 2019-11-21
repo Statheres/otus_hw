@@ -1,4 +1,4 @@
-package com.otus.hw.hw06.exceptions;
+package com.otus.hw.hw06.atm.exceptions;
 
 public class ATMException extends Exception {
     public ATMException() {

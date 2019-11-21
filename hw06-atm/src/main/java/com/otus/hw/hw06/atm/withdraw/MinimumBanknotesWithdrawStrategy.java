@@ -1,23 +1,25 @@
-package com.otus.hw.hw06;
+package com.otus.hw.hw06.atm.withdraw;
 
-import com.otus.hw.hw06.exceptions.InvalidWithdrawSum;
-import com.otus.hw.hw06.exceptions.NotEnoughBanknotesException;
+import com.otus.hw.hw06.atm.exceptions.InvalidWithdrawSum;
+import com.otus.hw.hw06.atm.exceptions.NotEnoughBanknotesException;
+import com.otus.hw.hw06.atm.money.Banknote;
+import com.otus.hw.hw06.atm.money.MoneyCell;
 
 import java.util.*;
 
 public class MinimumBanknotesWithdrawStrategy implements WithdrawStrategy {
     @Override
-    public Map<Integer, Integer> withdraw(int sum, List<MoneyCell> moneyCells) throws InvalidWithdrawSum, NotEnoughBanknotesException {
+    public Map<Banknote, Integer> withdraw(int sum, List<MoneyCell> moneyCells) throws InvalidWithdrawSum, NotEnoughBanknotesException {
         int maxDenomination = findMaxWithdrawDenomination(sum, moneyCells);
 
-        Map<Integer, Integer> cash = new TreeMap<>();
+        Map<Banknote, Integer> cash = new TreeMap<>();
         for (MoneyCell cell : moneyCells) {
             int denomination = cell.getDenomination();
             if (denomination <= maxDenomination) {
                 int withdrawBanknotesCount = Integer.min(cell.getBanknotesCount(), sum / denomination);
 
                 cell.withdraw(withdrawBanknotesCount);
-                cash.put(denomination, withdrawBanknotesCount);
+                cash.put(cell.getBanknote(), withdrawBanknotesCount);
 
                 sum -= denomination * withdrawBanknotesCount;
                 if (sum == 0) {
@@ -29,12 +31,16 @@ public class MinimumBanknotesWithdrawStrategy implements WithdrawStrategy {
         return cash;
     }
 
-    private int findMaxWithdrawDenomination(int sum, List<MoneyCell> moneyCells) throws InvalidWithdrawSum {
+    private int findMaxWithdrawDenomination(int sum, List<MoneyCell> moneyCells) throws NotEnoughBanknotesException, InvalidWithdrawSum {
+        if (sum <= 0) {
+            throw new InvalidWithdrawSum();
+        }
+
         List<Integer> banknoteCounts = calculateWithdrawBanknoteCounts(sum, moneyCells);
 
         int index = banknoteCounts.indexOf(Collections.min(banknoteCounts));
         if (banknoteCounts.get(index) == Integer.MAX_VALUE) {
-            throw new InvalidWithdrawSum();
+            throw new NotEnoughBanknotesException();
         }
 
         return moneyCells.get(index).getDenomination();
