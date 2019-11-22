@@ -18,6 +18,7 @@
         <module>hw02-generics</module>
         <module>hw04-bytecode</module>
         <module>hw05-annotations</module>
+        <module>hw06-atm</module>
     </modules>
 
     <properties>
@@ -28,6 +29,8 @@
         <com.google.guava.version>27.1-jre</com.google.guava.version>
         <org.apache.maven.plugin.assembly.version>3.1.1</org.apache.maven.plugin.assembly.version>
         <org.apache.maven.plugin.compiler.version>3.7.0</org.apache.maven.plugin.compiler.version>
+        <org.apache.maven.plugin.surefire.version>3.0.0-M3</org.apache.maven.plugin.surefire.version>
+        <junit-jupiter.version>5.5.2</junit-jupiter.version>
     </properties>
 
     <dependencyManagement>
@@ -37,12 +40,23 @@
                 <artifactId>guava</artifactId>
                 <version>${com.google.guava.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${org.apache.maven.plugin.surefire.version}</version>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
