@@ -40,4 +40,9 @@ public class DefaultMoneyCell implements MoneyCell {
     public int withdraw(int banknotesCount) throws NotEnoughBanknotesException {
         return this.banknotesCount -= banknotesCount;
     }
+
+    @Override
+    public MoneyCell clone() throws CloneNotSupportedException {
+        return (MoneyCell)super.clone();
+    }
 }

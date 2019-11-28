@@ -1,7 +1,5 @@
-package com.otus.hw.hw06;
+package com.otus.hw.hw06.atm;
 
-import com.otus.hw.hw06.atm.ATM;
-import com.otus.hw.hw06.atm.DefaultATM;
 import com.otus.hw.hw06.atm.exceptions.InvalidBanknoteException;
 import com.otus.hw.hw06.atm.exceptions.InvalidBanknotesCountException;
 import com.otus.hw.hw06.atm.money.Banknote;
