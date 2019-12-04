@@ -1,9 +1,6 @@
-package com.otus.hw.hw06;
+package com.otus.hw.hw06.atm;
 
-import com.otus.hw.hw06.atm.exceptions.InvalidBanknoteException;
-import com.otus.hw.hw06.atm.exceptions.InvalidBanknotesCountException;
-import com.otus.hw.hw06.atm.exceptions.InvalidWithdrawSum;
-import com.otus.hw.hw06.atm.exceptions.NotEnoughBanknotesException;
+import com.otus.hw.hw06.atm.exceptions.*;
 import com.otus.hw.hw06.atm.money.Banknote;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +15,7 @@ public class ATMWithdrawTest extends ATMAbstractTest {
 
     @BeforeEach
     @Override
-    void initATM() throws InvalidBanknoteException, InvalidBanknotesCountException {
+    void initATM() throws InvalidBanknoteException, InvalidBanknotesCountException, InvalidSnapshotException {
         super.initATM();
 
         Map<Banknote, Integer> banknotes = new HashMap<>();

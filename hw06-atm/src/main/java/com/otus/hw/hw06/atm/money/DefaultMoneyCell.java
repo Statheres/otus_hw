@@ -8,7 +8,12 @@ public class DefaultMoneyCell implements MoneyCell {
     private int banknotesCount;
 
     public DefaultMoneyCell(Banknote banknote) {
+        this(banknote, 0);
+    }
+
+    public DefaultMoneyCell(Banknote banknote, int banknotesCount) {
         this.banknote = banknote;
+        this.banknotesCount = banknotesCount;
     }
 
     @Override
@@ -39,5 +44,10 @@ public class DefaultMoneyCell implements MoneyCell {
     @Override
     public int withdraw(int banknotesCount) throws NotEnoughBanknotesException {
         return this.banknotesCount -= banknotesCount;
+    }
+
+    @Override
+    public MoneyCell clone() throws CloneNotSupportedException {
+        return (MoneyCell)super.clone();
     }
 }

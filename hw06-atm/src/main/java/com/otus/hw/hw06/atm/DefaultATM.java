@@ -1,21 +1,21 @@
 package com.otus.hw.hw06.atm;
 
-import com.otus.hw.hw06.atm.exceptions.InvalidBanknoteException;
-import com.otus.hw.hw06.atm.exceptions.InvalidBanknotesCountException;
-import com.otus.hw.hw06.atm.exceptions.InvalidWithdrawSum;
-import com.otus.hw.hw06.atm.exceptions.NotEnoughBanknotesException;
+import com.otus.hw.hw06.atm.exceptions.*;
 import com.otus.hw.hw06.atm.money.Banknote;
 import com.otus.hw.hw06.atm.money.MoneyCell;
 import com.otus.hw.hw06.atm.withdraw.WithdrawStrategy;
+import com.otus.hw.hw06.department.events.ATMDepartmentEvent;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 
 public class DefaultATM implements ATM {
     private final WithdrawStrategy withdrawStrategy;
-    private final List<MoneyCell> moneyCells;
+    private final ATMSnapshot snapshot;
+    private List<MoneyCell> moneyCells;
 
-    public DefaultATM(WithdrawStrategy withdrawStrategy, List<MoneyCell> moneyCells) {
+    public DefaultATM(WithdrawStrategy withdrawStrategy, List<MoneyCell> moneyCells) throws InvalidSnapshotException {
         this.withdrawStrategy = withdrawStrategy;
         this.moneyCells = moneyCells;
 
@@ -26,6 +26,8 @@ public class DefaultATM implements ATM {
 
             return o1.getDenomination() < o2.getDenomination() ? 1 : -1;
         });
+
+        snapshot = new ATMSnapshot(this);
     }
 
     @Override
@@ -54,5 +56,21 @@ public class DefaultATM implements ATM {
     @Override
     public int getTotalBalance() {
         return moneyCells.stream().mapToInt(MoneyCell::getBalance).sum();
+    }
+
+    @Override
+    public void reset() throws InvalidSnapshotException {
+        moneyCells = snapshot.getMoneyCells();
+    }
+
+    @Override
+    public List<MoneyCell> getMoneyCells() {
+        return moneyCells;
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        ATMDepartmentEvent event = (ATMDepartmentEvent) arg;
+        event.doCommand(this);
     }
 }
