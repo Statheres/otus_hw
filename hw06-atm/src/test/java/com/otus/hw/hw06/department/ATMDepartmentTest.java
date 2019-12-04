@@ -2,8 +2,7 @@ package com.otus.hw.hw06.department;
 
 import com.otus.hw.hw06.atm.ATM;
 import com.otus.hw.hw06.atm.DefaultATM;
-import com.otus.hw.hw06.atm.exceptions.InvalidBanknoteException;
-import com.otus.hw.hw06.atm.exceptions.InvalidBanknotesCountException;
+import com.otus.hw.hw06.atm.exceptions.*;
 import com.otus.hw.hw06.atm.money.Banknote;
 import com.otus.hw.hw06.atm.money.DefaultMoneyCell;
 import com.otus.hw.hw06.atm.withdraw.MinimumBanknotesWithdrawStrategy;
@@ -20,21 +19,22 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ATMDepartmentTest {
     private ATMDepartment department;
     private List<ATM> atms;
+    private int initialBalance;
 
-    private ATM createATM() {
+    private ATM createATM() throws InvalidSnapshotException {
         return new DefaultATM(
                 new MinimumBanknotesWithdrawStrategy(),
                 Arrays.asList(
-                        new DefaultMoneyCell(Banknote.ONE_THOUSAND),
-                        new DefaultMoneyCell(Banknote.FIVE_HUNDRED),
-                        new DefaultMoneyCell(Banknote.HUNDRED),
-                        new DefaultMoneyCell(Banknote.FIFTY)
+                        new DefaultMoneyCell(Banknote.ONE_THOUSAND, 25),
+                        new DefaultMoneyCell(Banknote.FIVE_HUNDRED, 1),
+                        new DefaultMoneyCell(Banknote.HUNDRED, 43),
+                        new DefaultMoneyCell(Banknote.FIFTY, 198)
                 )
         );
     }
 
     @BeforeEach
-    void initTest() {
+    void initTest() throws InvalidSnapshotException {
         atms = Arrays.asList(
                 createATM(),
                 createATM()
@@ -44,6 +44,8 @@ public class ATMDepartmentTest {
         for (ATM atm : atms) {
             department.addATM(atm);
         }
+
+        initialBalance = department.getTotalBalance();
     }
 
     @Test
@@ -53,25 +55,26 @@ public class ATMDepartmentTest {
         banknotes.put(Banknote.FIVE_HUNDRED, 56);
         banknotes.put(Banknote.HUNDRED, 568);
 
-        int balance = banknotes.entrySet().stream()
+        int depositSum = banknotes.entrySet().stream()
                 .mapToInt(entry -> entry.getKey().getDenomination() * entry.getValue())
                 .sum();
 
-        assertEquals(0, department.getTotalBalance());
-
         atms.get(0).deposit(banknotes);
 
-        assertEquals(balance, department.getTotalBalance());
+        assertEquals(initialBalance + depositSum, department.getTotalBalance());
     }
 
     @Test
     void reset() {
+        // Deposit/reset
         Map<Banknote, Integer> banknotes = new HashMap<>();
         banknotes.put(Banknote.ONE_THOUSAND, 1);
         banknotes.put(Banknote.FIVE_HUNDRED, 56);
         banknotes.put(Banknote.HUNDRED, 568);
 
-        assertEquals(0, department.getTotalBalance());
+        int depositSum = banknotes.entrySet().stream()
+                .mapToInt(entry -> entry.getKey().getDenomination() * entry.getValue())
+                .sum();
 
         atms.forEach(atm -> {
             try {
@@ -81,10 +84,27 @@ public class ATMDepartmentTest {
             }
         });
 
-        assertNotEquals(0, department.getTotalBalance());
+        assertEquals(initialBalance + depositSum * atms.size(), department.getTotalBalance());
 
         department.reset();
 
-        assertEquals(0, department.getTotalBalance());
+        assertEquals(initialBalance, department.getTotalBalance());
+
+        // Withdraw/reset
+        int withdrawSum = 450;
+
+        atms.forEach(atm -> {
+            try {
+                atm.withdraw(withdrawSum);
+            } catch (InvalidWithdrawSum | NotEnoughBanknotesException e) {
+                e.printStackTrace();
+            }
+        });
+
+        assertEquals(initialBalance - withdrawSum * atms.size(), department.getTotalBalance());
+
+        department.reset();
+
+        assertEquals(initialBalance, department.getTotalBalance());
     }
 }

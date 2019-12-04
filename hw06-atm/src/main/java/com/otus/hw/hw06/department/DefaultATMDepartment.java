@@ -8,7 +8,7 @@ import java.util.Observable;
 import java.util.Set;
 
 public class DefaultATMDepartment extends Observable implements ATMDepartment {
-    private Set<ATM> atms = new HashSet<>();
+    private final Set<ATM> atms = new HashSet<>();
 
     @Override
     public void addATM(ATM atm) {
@@ -18,10 +18,6 @@ public class DefaultATMDepartment extends Observable implements ATMDepartment {
 
     @Override
     public int getTotalBalance() {
-        int sum = 0;
-        for (ATM atm : atms) {
-            sum += atm.getTotalBalance();
-        }
         return atms.stream().mapToInt(ATM::getTotalBalance).sum();
     }
 

@@ -1,9 +1,6 @@
 package com.otus.hw.hw06.atm;
 
-import com.otus.hw.hw06.atm.exceptions.InvalidBanknoteException;
-import com.otus.hw.hw06.atm.exceptions.InvalidBanknotesCountException;
-import com.otus.hw.hw06.atm.exceptions.InvalidWithdrawSum;
-import com.otus.hw.hw06.atm.exceptions.NotEnoughBanknotesException;
+import com.otus.hw.hw06.atm.exceptions.*;
 import com.otus.hw.hw06.atm.money.Banknote;
 import com.otus.hw.hw06.atm.money.MoneyCell;
 import com.otus.hw.hw06.atm.withdraw.WithdrawStrategy;
@@ -18,7 +15,7 @@ public class DefaultATM implements ATM {
     private final ATMSnapshot snapshot;
     private List<MoneyCell> moneyCells;
 
-    public DefaultATM(WithdrawStrategy withdrawStrategy, List<MoneyCell> moneyCells) {
+    public DefaultATM(WithdrawStrategy withdrawStrategy, List<MoneyCell> moneyCells) throws InvalidSnapshotException {
         this.withdrawStrategy = withdrawStrategy;
         this.moneyCells = moneyCells;
 
@@ -62,7 +59,7 @@ public class DefaultATM implements ATM {
     }
 
     @Override
-    public void reset() {
+    public void reset() throws InvalidSnapshotException {
         moneyCells = snapshot.getMoneyCells();
     }
 

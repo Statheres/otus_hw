@@ -1,9 +1,6 @@
 package com.otus.hw.hw06.atm;
 
-import com.otus.hw.hw06.atm.exceptions.InvalidBanknoteException;
-import com.otus.hw.hw06.atm.exceptions.InvalidBanknotesCountException;
-import com.otus.hw.hw06.atm.exceptions.InvalidWithdrawSum;
-import com.otus.hw.hw06.atm.exceptions.NotEnoughBanknotesException;
+import com.otus.hw.hw06.atm.exceptions.*;
 import com.otus.hw.hw06.atm.money.Banknote;
 import com.otus.hw.hw06.atm.money.MoneyCell;
 
@@ -18,7 +15,7 @@ public interface ATM extends Observer {
 
     int getTotalBalance();
 
-    void reset();
+    void reset() throws InvalidSnapshotException;
 
     List<MoneyCell> getMoneyCells();
 }
