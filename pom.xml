@@ -20,10 +20,11 @@
         <module>hw05-annotations</module>
         <module>hw06-atm</module>
         <module>hw07-json</module>
+        <module>hw08-jdbc</module>
     </modules>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -70,6 +71,7 @@
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
+                        <release>${java.version}</release>
                     </configuration>
                 </plugin>
             </plugins>
